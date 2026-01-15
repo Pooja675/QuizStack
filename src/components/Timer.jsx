@@ -54,4 +54,5 @@ const Timer = ({ duration, onTimeUp, isActive }) => {
 }
 
 
+
 export default Timer

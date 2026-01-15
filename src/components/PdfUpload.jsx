@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useQuiz } from "../hooks/useQuiz";
 
-const PdfUpload = ({ onPdfUpload, isGenerating }) => {
-   const [selectedFile, setSelectedFile] = useState(null);
+const PdfUpload = () => {
+ const { generateQuizFromPdf, isGenerating } = useQuiz();
+  const [selectedFile, setSelectedFile] = useState(null);
   const [numQuestions, setNumQuestions] = useState(10);
   const [difficulty, setDifficulty] = useState('medium');
+  const [language, setLanguage] = useState('auto');
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -14,9 +17,43 @@ const PdfUpload = ({ onPdfUpload, isGenerating }) => {
 
   const handleGenerate = () => {
     if (selectedFile) {
-      onPdfUpload(selectedFile, numQuestions, difficulty);
+      generateQuizFromPdf(selectedFile, numQuestions, difficulty, language);
     }
   };
+
+  const languages = [
+    { code: 'auto', name: 'Auto-detect from PDF' },
+    { code: 'English', name: 'English' },
+    { code: 'Hindi', name: 'हिंदी (Hindi)' },
+    { code: 'Spanish', name: 'Español (Spanish)' },
+    { code: 'French', name: 'Français (French)' },
+    { code: 'German', name: 'Deutsch (German)' },
+    { code: 'Chinese', name: '中文 (Chinese)' },
+    { code: 'Japanese', name: '日本語 (Japanese)' },
+    { code: 'Korean', name: '한국어 (Korean)' },
+    { code: 'Arabic', name: 'العربية (Arabic)' },
+    { code: 'Portuguese', name: 'Português (Portuguese)' },
+    { code: 'Russian', name: 'Русский (Russian)' },
+    { code: 'Italian', name: 'Italiano (Italian)' },
+    { code: 'Dutch', name: 'Nederlands (Dutch)' },
+    { code: 'Turkish', name: 'Türkçe (Turkish)' },
+    { code: 'Polish', name: 'Polski (Polish)' },
+    { code: 'Vietnamese', name: 'Tiếng Việt (Vietnamese)' },
+    { code: 'Thai', name: 'ไทย (Thai)' },
+    { code: 'Indonesian', name: 'Bahasa Indonesia' },
+    { code: 'Malay', name: 'Bahasa Melayu' },
+    { code: 'Bengali', name: 'বাংলা (Bengali)' },
+    { code: 'Tamil', name: 'தமிழ் (Tamil)' },
+    { code: 'Telugu', name: 'తెలుగు (Telugu)' },
+    { code: 'Marathi', name: 'मराठी (Marathi)' },
+    { code: 'Gujarati', name: 'ગુજરાતી (Gujarati)' },
+    { code: 'Urdu', name: 'اردو (Urdu)' },
+    { code: 'Punjabi', name: 'ਪੰਜਾਬੀ (Punjabi)' },
+    { code: 'Kannada', name: 'ಕನ್ನಡ (Kannada)' },
+    { code: 'Malayalam', name: 'മലയാളം (Malayalam)' },
+    { code: 'Odia', name: 'ଓଡ଼ିଆ (Odia)' },
+    { code: 'Assamese', name: 'অসমীয়া (Assamese)' }
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
@@ -88,6 +125,29 @@ const PdfUpload = ({ onPdfUpload, isGenerating }) => {
           </select>
         </div>
 
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Quiz Language
+          </label>
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            disabled={isGenerating}
+          >
+            {languages.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            {language === 'auto' 
+              ? '🤖 AI will detect and use the document\'s language automatically'
+              : `📝 Quiz will be generated in ${language}`}
+          </p>
+        </div>
+
         <button
           onClick={handleGenerate}
           disabled={!selectedFile || isGenerating}
@@ -100,12 +160,13 @@ const PdfUpload = ({ onPdfUpload, isGenerating }) => {
           <div className="mt-4 text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             <p className="text-sm text-gray-600 mt-2">Gemini AI is analyzing your document...</p>
-            <p className="text-xs text-gray-500 mt-1">This may take 10-30 seconds</p>
           </div>
         )}
       </div>
     </div>
   );
+
 }
+
 
 export default PdfUpload
