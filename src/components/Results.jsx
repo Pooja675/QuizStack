@@ -1,8 +1,18 @@
 import { useQuiz } from "../hooks/useQuiz";
+import generateQuizOnlyPDF from "./generateQuizOnlyPDF ";
+import GenerateQuizWithAnswersPDF from "./GenerateQuizWithAnswersPDF ";
 
 const Results = () => {
-  const { quizData, score, answeredQuestions, resetQuiz, loadNewDocument, regenerateQuiz } = useQuiz();
+ const { quizData, score, answeredQuestions, resetQuiz, loadNewDocument, regenerateQuiz } = useQuiz();
   const percentage = Math.round((score / quizData.questions.length) * 100);
+
+  const handleDownloadQuizOnly = () => {
+    generateQuizOnlyPDF(quizData);
+  };
+
+  const handleDownloadQuizWithAnswers = () => {
+    GenerateQuizWithAnswersPDF(quizData);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
@@ -44,6 +54,37 @@ const Results = () => {
               )}
             </div>
           ))}
+        </div>
+
+        {/* Download Buttons Section */}
+        <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-6">
+          <h3 className="font-semibold text-lg text-gray-800 mb-4 flex items-center">
+            <span className="text-2xl mr-2">📄</span>
+            Export Quiz as PDF
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <button
+              onClick={handleDownloadQuizOnly}
+              className="flex items-center justify-center gap-2 bg-white border-2 border-blue-500 text-blue-600 font-semibold py-3 px-4 rounded-lg hover:bg-blue-50 transition"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Quiz Only
+            </button>
+            <button
+              onClick={handleDownloadQuizWithAnswers}
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold py-3 px-4 rounded-lg hover:from-green-600 hover:to-emerald-700 transition"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Quiz + Answers
+            </button>
+          </div>
+          <p className="text-xs text-gray-600 mt-3 text-center">
+            💡 Click the button, then use your browser's "Save as PDF" option in the print dialog
+          </p>
         </div>
 
         <div className="flex gap-3">
