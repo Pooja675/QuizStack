@@ -1,6 +1,6 @@
 import React from 'react'
 
-const GenerateQuizWithAnswersPDF  = async (quizData) => {
+const generateQuizWithAnswersPDF  = async (quizData) => {
   try {
     const { default: jsPDF } = await import('jspdf');
     await import('jspdf-autotable');
@@ -146,4 +146,4 @@ const GenerateQuizWithAnswersPDF  = async (quizData) => {
   }
 }
 
-export default GenerateQuizWithAnswersPDF 
+export default generateQuizWithAnswersPDF 

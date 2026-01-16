@@ -1,6 +1,6 @@
 import { useQuiz } from "../hooks/useQuiz";
 import generateQuizOnlyPDF from "./generateQuizOnlyPDF ";
-import GenerateQuizWithAnswersPDF from "./GenerateQuizWithAnswersPDF ";
+import generateQuizWithAnswersPDF from "./generateQuizWithAnswersPDF ";
 
 const Results = () => {
  const { quizData, score, answeredQuestions, resetQuiz, loadNewDocument, regenerateQuiz } = useQuiz();
@@ -11,7 +11,7 @@ const Results = () => {
   };
 
   const handleDownloadQuizWithAnswers = () => {
-    GenerateQuizWithAnswersPDF(quizData);
+    generateQuizWithAnswersPDF(quizData);
   };
 
   return (
