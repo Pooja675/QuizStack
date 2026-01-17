@@ -56,3 +56,45 @@ An intelligent quiz generation application powered by Google's Gemini AI that au
 - **Accessibility**: Keyboard navigation and screen reader support
 - **Color-Coded Feedback**: Green for correct, red for incorrect answers
 
+## 🎯 How to Use
+
+### 1. Upload a PDF Document
+- Click on the upload area or drag & drop a PDF file
+- Supports educational materials, textbooks, research papers, etc.
+
+### 2. Configure Quiz Settings
+- **Number of Questions**: Slide to select 5-20 questions
+- **Difficulty Level**: Choose Easy, Medium, or Hard
+- **Language**: Auto-detect or force a specific language
+
+### 3. Generate Quiz
+- Click "Generate Quiz with AI"
+- Wait 10-30 seconds for AI processing
+- Quiz automatically loads when ready
+
+### 4. Set Timer (Optional)
+- Configure total time limit for the entire quiz
+- Set time per question
+- Or skip timers for unlimited time
+
+### 5. Take the Quiz
+- Read each question carefully
+- Select your answer by clicking an option
+- Use Previous/Next buttons to navigate
+- Click "Review All Answers" to see progress
+
+### 6. Review and Submit
+- Check all your answers
+- Edit any answer by clicking "Edit"
+- Submit when ready
+
+### 7. View Results
+- See your score and percentage
+- Review correct/incorrect answers
+- Read explanations for each question
+
+### 8. Export Results
+- **Download Quiz Only**: For practice or classroom use
+- **Download Quiz + Answers**: For answer keys
+
+
