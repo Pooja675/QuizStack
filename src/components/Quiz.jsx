@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Timer from "./Timer";
 import SettingsModal from "./SettingsModal";
 import { useQuiz } from "../hooks/useQuiz";
+import DownloadScreen from "./DownloadScreen";
 
 const Quiz = () => {
-    const {
+     const {
     quizData,
     currentQuestion,
     userAnswers,
@@ -18,17 +19,20 @@ const Quiz = () => {
     setShowSettings,
     setQuizSettings,
     setTotalTimeLeft,
-    setShowReview,
-    setShowResult,
-    setScore,
-    setAnsweredQuestions
+    setShowReview
   } = useQuiz();
+
+  const [showDownloadScreen, setShowDownloadScreen] = useState(true);
 
   const handleStartQuiz = (settings) => {
     setQuizSettings(settings);
     if (settings.timeLimit) {
       setTotalTimeLeft(settings.timeLimit);
     }
+  };
+
+  const handleProceedFromDownload = () => {
+    setShowDownloadScreen(false);
   };
 
   const handleAnswerClick = (index) => {
@@ -64,32 +68,20 @@ const Quiz = () => {
   };
 
   const handleTotalTimeUp = () => {
-    let calculatedScore = 0;
-    const answers = [];
-    
-    userAnswers.forEach((answer, idx) => {
-      const isCorrect = answer === quizData.questions[idx].correctAnswer;
-      if (isCorrect) calculatedScore++;
-      
-      answers.push({
-        question: quizData.questions[idx].question,
-        selected: answer,
-        correct: quizData.questions[idx].correctAnswer,
-        isCorrect,
-        explanation: quizData.questions[idx].explanation
-      });
-    });
-    
-    setScore(calculatedScore);
-    setAnsweredQuestions(answers);
-    setShowResult(true);
-    localStorage.removeItem('quizProgress');
+    setShowReview(true);
   };
 
+  // Show Download Screen first (only for English quizzes)
+  if (showDownloadScreen) {
+    return <DownloadScreen quizData={quizData} onProceed={handleProceedFromDownload} />;
+  }
+
+  // Then show Settings Modal
   if (showSettings) {
     return <SettingsModal onClose={() => setShowSettings(false)} onStart={handleStartQuiz} />;
   }
 
+  // Then show actual Quiz
   const currentQ = quizData.questions[currentQuestion];
   const progressPercentage = ((currentQuestion + 1) / quizData.questions.length) * 100;
 
@@ -192,6 +184,7 @@ const Quiz = () => {
       </div>
     </div>
   );
+
 
 };
 
