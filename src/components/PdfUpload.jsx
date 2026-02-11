@@ -159,7 +159,7 @@ const PdfUpload = () => {
         {isGenerating && (
           <div className="mt-4 text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <p className="text-sm text-gray-600 mt-2">Gemini AI is analyzing your document...</p>
+            <p className="text-sm text-gray-600 mt-2">Analyzing your document...</p>
           </div>
         )}
       </div>
