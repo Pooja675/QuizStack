@@ -1,12 +1,31 @@
+import { useEffect } from 'react';
 import PdfUpload from "./components/PdfUpload";
 import Quiz from "./components/Quiz";
 import Results from "./components/Results";
 import ReviewScreen from "./components/ReviewScreen";
 import { useQuiz } from "./hooks/useQuiz";
-
+import { initGA, trackPageView } from "./utils/analytics";
 
 function App() {
- const { quizData, showResult, showReview, error, setError } = useQuiz();
+  const { quizData, showResult, showReview, error, setError } = useQuiz();
+
+  // Initialize Google Analytics when app loads
+  useEffect(() => {
+    initGA();
+  }, []);
+
+  // Track page view changes based on app state
+  useEffect(() => {
+    if (showResult) {
+      trackPageView('/results', 'Quiz Results');
+    } else if (showReview) {
+      trackPageView('/review', 'Review Answers');
+    } else if (quizData) {
+      trackPageView('/quiz', 'Taking Quiz');
+    } else {
+      trackPageView('/', 'Upload PDF');
+    }
+  }, [showResult, showReview, quizData]);
 
   if (showResult) {
     return <Results />;
@@ -37,7 +56,6 @@ function App() {
       )}
     </>
   );
-
 }
 
 export default App;

@@ -1,4 +1,5 @@
 import { useQuiz } from "../hooks/useQuiz";
+import { trackEvent } from "../utils/analytics";
 
 const ReviewScreen = () => {
   const {
@@ -13,6 +14,9 @@ const ReviewScreen = () => {
   } = useQuiz();
 
   const handleEditAnswer = (questionIndex) => {
+    // Track when user edits an answer
+    trackEvent('Review', 'Edit Answer', `Question ${questionIndex + 1}`, questionIndex + 1);
+    
     setCurrentQuestion(questionIndex);
     setSelectedAnswer(userAnswers[questionIndex]);
     setShowReview(false);
@@ -35,12 +39,36 @@ const ReviewScreen = () => {
       });
     });
 
+    // Track quiz submission
+    const answeredCount = userAnswers.filter((a) => a !== null).length;
+    const totalQuestions = quizData.questions.length;
+    const percentageScore = Math.round((calculatedScore / totalQuestions) * 100);
+    
+    trackEvent('Quiz', 'Submitted from Review', 'Quiz Completed', calculatedScore);
+    trackEvent('Quiz', 'Completion Rate', `${answeredCount}/${totalQuestions}`, answeredCount);
+    trackEvent('Quiz', 'Score Percentage', `${percentageScore}%`, percentageScore);
+
     setScore(calculatedScore);
     setAnsweredQuestions(answers);
     setShowReview(false);
     setShowResult(true);
     localStorage.removeItem("quizProgress");
   };
+
+  const handleBackToQuiz = () => {
+    // Track when user goes back to quiz without submitting
+    trackEvent('Review', 'Back to Quiz', 'User returned to edit answers');
+    setShowReview(false);
+  };
+
+  // Track review screen view metrics on load
+  const answeredCount = userAnswers.filter((a) => a !== null).length;
+  const unansweredCount = quizData.questions.length - answeredCount;
+  
+  // Track if user has unanswered questions
+  if (unansweredCount > 0) {
+    trackEvent('Review', 'Unanswered Questions', `${unansweredCount} questions`, unansweredCount);
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
@@ -53,13 +81,12 @@ const ReviewScreen = () => {
           <p className="text-sm text-blue-800">
             You've answered{" "}
             <span className="font-bold">
-              {userAnswers.filter((a) => a !== null).length}
+              {answeredCount}
             </span>{" "}
             out of{" "}
             <span className="font-bold">{quizData.questions.length}</span>{" "}
             questions.
-            {userAnswers.filter((a) => a !== null).length <
-              quizData.questions.length && (
+            {answeredCount < quizData.questions.length && (
               <span className="block mt-2 text-red-600 font-semibold">
                 ⚠️ You have unanswered questions!
               </span>
@@ -114,7 +141,7 @@ const ReviewScreen = () => {
             Submit Quiz
           </button>
           <button
-            onClick={() => setShowReview(false)}
+            onClick={handleBackToQuiz}
             className="flex-1 bg-gray-500 text-white font-semibold py-3 rounded-lg hover:bg-gray-600 transition"
           >
             Back to Quiz

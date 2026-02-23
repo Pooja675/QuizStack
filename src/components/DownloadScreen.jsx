@@ -1,10 +1,19 @@
 // src/components/DownloadScreen.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateQuizOnlyPDF } from "./GenerateQuizOnlyPDF";
 import { generateQuizWithAnswersPDF } from "./GenerateQuizWithAnswersPDF";
+import { trackEvent } from "../utils/analytics";
 
 const DownloadScreen = ({ quizData, onProceed }) => {
   const [isDownloading, setIsDownloading] = useState(false);
+
+  // Track download screen view
+  useEffect(() => {
+    if (isEnglishQuiz()) {
+      trackEvent('Download Screen', 'Viewed', 'User reached download options');
+      trackEvent('Quiz', 'Generated Successfully', quizData?.title || 'Untitled Quiz');
+    }
+  }, []);
 
   const isEnglishQuiz = () => {
     const lang = quizData?.language?.toLowerCase() || "";
@@ -20,10 +29,23 @@ const DownloadScreen = ({ quizData, onProceed }) => {
 
   const handleDownloadQuizOnly = async () => {
     setIsDownloading(true);
+    
+    // Track download attempt
+    trackEvent('Download', 'Quiz Only', quizData?.title || 'Untitled', quizData?.questions?.length || 0);
+    trackEvent('Download', 'Format Selected', 'Questions Only');
+    
     try {
       await generateQuizOnlyPDF(quizData);
+      
+      // Track successful download
+      trackEvent('Download', 'Success', 'Quiz Only PDF', quizData?.questions?.length || 0);
+      
     } catch (error) {
       console.error("Error downloading quiz:", error);
+      
+      // Track download failure
+      trackEvent('Download', 'Failed', 'Quiz Only PDF', 0);
+      
       alert("Failed to download quiz. Please try again.");
     } finally {
       setIsDownloading(false);
@@ -32,18 +54,54 @@ const DownloadScreen = ({ quizData, onProceed }) => {
 
   const handleDownloadQuizWithAnswers = async () => {
     setIsDownloading(true);
+    
+    // Track download attempt
+    trackEvent('Download', 'Quiz with Answers', quizData?.title || 'Untitled', quizData?.questions?.length || 0);
+    trackEvent('Download', 'Format Selected', 'Questions + Answer Key');
+    
     try {
       await generateQuizWithAnswersPDF(quizData);
+      
+      // Track successful download
+      trackEvent('Download', 'Success', 'Quiz with Answers PDF', quizData?.questions?.length || 0);
+      
     } catch (error) {
       console.error("Error downloading quiz with answers:", error);
+      
+      // Track download failure
+      trackEvent('Download', 'Failed', 'Quiz with Answers PDF', 0);
+      
       alert("Failed to download quiz. Please try again.");
     } finally {
       setIsDownloading(false);
     }
   };
 
+  const handleProceedToQuiz = () => {
+    // Track when user proceeds without downloading
+    trackEvent('Download Screen', 'Start Quiz Preview', 'User started quiz without downloading');
+    trackEvent('Navigation', 'Proceed to Quiz', 'From Download Screen');
+    
+    if (onProceed) {
+      onProceed();
+    }
+  };
+
+  const handleSkip = () => {
+    // Track when user skips download screen
+    trackEvent('Download Screen', 'Skipped', 'User skipped download options');
+    trackEvent('Navigation', 'Skip Download', 'Proceeded without downloading');
+    
+    if (onProceed) {
+      onProceed();
+    }
+  };
+
   // If quiz is not in English, skip download screen
   if (!isEnglishQuiz()) {
+    // Track auto-skip for non-English quizzes
+    trackEvent('Download Screen', 'Auto-skipped', `Non-English Quiz: ${quizData?.language}`);
+    
     // Automatically proceed to quiz settings
     if (onProceed) {
       setTimeout(() => onProceed(), 0);
@@ -193,14 +251,14 @@ const DownloadScreen = ({ quizData, onProceed }) => {
         {/* Action Buttons */}
         <div className="flex gap-3">
           <button
-            onClick={onProceed}
+            onClick={handleProceedToQuiz}
             disabled={isDownloading}
             className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition shadow-lg disabled:opacity-50"
           >
             {isDownloading ? "Downloading..." : "Start Quiz Preview"}
           </button>
           <button
-            onClick={onProceed}
+            onClick={handleSkip}
             disabled={isDownloading}
             className="flex-1 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-medium rounded-lg hover:from-blue-600 hover:to-purple-700 transition shadow-lg disabled:opacity-50"
           >

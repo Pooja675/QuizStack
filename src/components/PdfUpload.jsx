@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useQuiz } from "../hooks/useQuiz";
+import { trackDocumentUploaded, trackEvent } from "../utils/analytics";
 
 const PdfUpload = () => {
- const { generateQuizFromPdf, isGenerating } = useQuiz();
+  const { generateQuizFromPdf, isGenerating } = useQuiz();
   const [selectedFile, setSelectedFile] = useState(null);
   const [numQuestions, setNumQuestions] = useState(10);
   const [difficulty, setDifficulty] = useState('medium');
@@ -12,13 +13,38 @@ const PdfUpload = () => {
     const file = e.target.files[0];
     if (file && file.type === 'application/pdf') {
       setSelectedFile(file);
+      
+      // Track document upload
+      trackDocumentUploaded('pdf', file.size);
+      trackEvent('Document', 'Selected', file.name, Math.round(file.size / 1024)); // size in KB
     }
   };
 
   const handleGenerate = () => {
     if (selectedFile) {
+      // Track quiz generation attempt
+      trackEvent('Quiz', 'Generation Started', difficulty, numQuestions);
+      trackEvent('Settings', 'Language Selected', language);
+      trackEvent('Settings', 'Difficulty Selected', difficulty);
+      trackEvent('Settings', 'Questions Count', numQuestions.toString(), numQuestions);
+      
       generateQuizFromPdf(selectedFile, numQuestions, difficulty, language);
     }
+  };
+
+  const handleDifficultyChange = (newDifficulty) => {
+    setDifficulty(newDifficulty);
+    trackEvent('Settings', 'Difficulty Changed', newDifficulty);
+  };
+
+  const handleLanguageChange = (newLanguage) => {
+    setLanguage(newLanguage);
+    trackEvent('Settings', 'Language Changed', newLanguage);
+  };
+
+  const handleQuestionCountChange = (count) => {
+    setNumQuestions(count);
+    trackEvent('Settings', 'Question Count Changed', count.toString(), count);
   };
 
   const languages = [
@@ -103,7 +129,7 @@ const PdfUpload = () => {
             min="5"
             max="20"
             value={numQuestions}
-            onChange={(e) => setNumQuestions(parseInt(e.target.value))}
+            onChange={(e) => handleQuestionCountChange(parseInt(e.target.value))}
             className="w-full"
             disabled={isGenerating}
           />
@@ -115,7 +141,7 @@ const PdfUpload = () => {
           </label>
           <select
             value={difficulty}
-            onChange={(e) => setDifficulty(e.target.value)}
+            onChange={(e) => handleDifficultyChange(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             disabled={isGenerating}
           >
@@ -131,7 +157,7 @@ const PdfUpload = () => {
           </label>
           <select
             value={language}
-            onChange={(e) => setLanguage(e.target.value)}
+            onChange={(e) => handleLanguageChange(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             disabled={isGenerating}
           >
@@ -165,8 +191,6 @@ const PdfUpload = () => {
       </div>
     </div>
   );
-
 }
 
-
-export default PdfUpload
+export default PdfUpload;
